@@ -5,7 +5,9 @@
 package gui;
 
 import Logic.HotelService;
+import Model.Pieza;
 import Repository.*;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -55,19 +57,71 @@ public class Main {
                 String tipo = leerTexto("Tipo de pieza (Simple, Doble, Matrimonial)");
                 int noches = leerEntero("Numero de noches: ");
                 double total = hotelService.consultarPrecioTotal(rut, tipo, noches);
-                System.out.println("El precio total es: $%.2f%n"+ total);
+                System.out.println("El precio total es: "+ total);
                 break;
             case 2:
+                String tipoR = leerTexto("Tipo de pieza (Simple, Doble, Matrimonial): ");
+                String rutR = leerTexto("RUT del cliente: ");
+                String nombreR = leerTexto("Nombre del cliente: ");
+                int diasR = leerEntero("Numero de dias: ");
+                if(hotelService.reservarPieza(tipoR, rutR, nombreR, diasR)) {
+                    System.out.println("Reserva realizada con exito");
+                } else {
+                    System.out.println("No hay piezas disponibles");
+                }
+                break;
             case 3:
+                String numPieza = leerTexto("Numero de pieza a liberar");
+                if(hotelService.eliminarReservacion(numPieza)){
+                    System.out.println("Reserva eliminada y pieza liberada");
+                } else {
+                    System.out.println("No se encontro una reserva en esta pieza");
+                }
+                break;
             case 4:
+                String tipoD = leerTexto("Tipo de pieza (Simple, Doble, Matrimonial)");
+                List<Pieza> disponibles = hotelService.getPiezasDisponibles(tipoD);
+                System.out.println("Piezas disponibles" + tipoD + disponibles.size());
+                for(Pieza p : disponibles) System.out.println("Pieza numero: " + p.getNumeroPieza());
+                break;
             case 5:
+                String tipoF = leerTexto("Tipo de pieza (Simple, Doble, Matrimonial)");
+                hotelService.dibujarFotoPieza(tipoF);
+                break;
             case 0: break;
             default: System.out.println("Opcion no valida");
         }
     }
 
     private static void menuAdministrador() {
+        System.out.println("--- MENU ADMINISTRADOR ---");
+        System.out.println("1. cambiar precio de pieza");
+        System.out.println("2. cambiar descuento habitual");
+        System.out.println("3. calcular ganancias del mes");
+        System.out.println("0. volver");
         
+        int opcion = leerEntero("Seleccione una opcion");
+        
+        switch (opcion){
+            case 1:
+                String tipo = leerTexto("Tipo de pieza (Simple, Doble, Matrimonial)");
+                double precio = leerDoble("Nuevo precio base: ");
+                hotelService.cambiarPrecioPieza(tipo, precio);
+                System.out.println("Precio de "+ tipo +" actualizado a "+ precio);
+                break;
+            case 2:
+                double desc = leerDoble("Nuevo descuento");
+                hotelService.cambiarDescuentoHabitua(desc);
+                System.out.println("Descuento de clientes habituales actualiazado a: "+ desc * 100);
+                break;
+            case 3:
+                int mes = leerEntero("Numero de mes (Ej. 11 para noviembre)");
+                double ganancias = hotelService.calcularGananciasMes(mes);
+                System.out.println("Las ganancias totales del mes "+ mes + "son de " + ganancias);
+                break;
+            case 0: break;
+            default: System.out.println("Opcion no valida");
+        }
     }
 
     private static String leerTexto(String mensaje){
